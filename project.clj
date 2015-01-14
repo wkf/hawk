@@ -1,4 +1,4 @@
-(defproject hawk "0.1.1"
+(defproject hawk "0.2.0-SNAPSHOT"
   :description "Watch files with clojure (in the manner of a hawk)"
   :url "https://github.com/wkf/hawk"
   :license {:name "Eclipse Public License"
