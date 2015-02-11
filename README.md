@@ -2,6 +2,10 @@
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/wkf/hawk?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+<p align="center">
+	<img align="center" src="hawk_www/resources/public/img/hawk-400x400-high.png?raw=true" alt="Hawk" />
+</p>
+
 > Yawp.
 
 A Clojure library designed to watch files and directories. Like a hawk.
@@ -59,7 +63,7 @@ To start a stateful watch, use `:context` to initialize the state, and then just
 
     (hawk/watch! [{:paths ["src/main/hawk"]
                    :context (constantly 1)
-                   :handler (fn [ctx _] (inc ctx)}])
+                   :handler (fn [ctx _] (inc ctx))}])
 
 The `:context` function is passed only the group's current context, and is expected to return the new context value.
 
@@ -75,7 +79,7 @@ Hawk supports multiple watches with a single call to `watch!`. `watch!` accepts 
                     (inc ctx))}
         {:paths ["src/test/hawk"]
          ;; ...and then incremented to 2 by the second watch in the group
-         :context (fn [ctx] (inc ctx)
+         :context (fn [ctx] (inc ctx))
          :handler (fn [_ _]
                     (println "I'm always second place."))}]
        ;; here is the second watch group
