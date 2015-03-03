@@ -3,26 +3,30 @@
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/wkf/hawk?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 <p align="center">
-	<img align="center" src="hawk_www/resources/public/img/hawk-400x400-high.png?raw=true" alt="Hawk" />
+  <a href="#logo">
+    <img align="center" src="hawk_www/resources/public/img/hawk-400x400-high.png?raw=true" alt="Hawk" />
+  </a>
 </p>
 
-> Yawp.
-
-A Clojure library designed to watch files and directories. Like a hawk.
+A Clojure library designed to watch files and directories.
 
 Like most clojure file watchers, hawk wraps the JDK 7 java.nio.file.WatchService API. This works great when Java has a native implementation for  your platform of choice. However, this is not the case on OS X, so hawk also wraps the [Barbary WatchService](https://code.google.com/p/barbarywatchservice/) to provide performant monitoring even if you're using a mac. An appropriate implementation is chosen automatically, so all you have to do is install hawk and relax.
 
 Hawk also features:
 
-* a facility to handle "stateful" watches
-* the ability to filter watches, and some handy built-in filters
-* a name that is also a kind of bird
+* A facility to handle "stateful" watches
+* The ability to filter watches, and some handy built-in filters
+* A name that is also a kind of bird
+
+***
 
 ## Installation
 
 To install, add the following dependency to your project.clj file:
 
     [hawk "0.1.1"]
+
+***
 
 ## Usage
 
@@ -43,8 +47,8 @@ To start a simple watch:
 
 The `:handler` function is passed both the group's context value and the event being handled, and is expected to return the new context value. The event hash has the following structure:
 
-    {:kind :create                  ;; the event kind, one of: #{:create :modify :delete}
-     :file #<File /SOME/FILE/PATH>} ;; the (canonicalized) affected file
+    {:kind :create           ;; the event kind, one of: #{:create :modify :delete}
+     :file #java.io.File{} } ;; the (canonicalized) affected file
 
 ### Filtered Watches
 
@@ -84,7 +88,7 @@ Hawk supports multiple watches with a single call to `watch!`. `watch!` accepts 
                     (println "I'm always second place."))}]
        ;; here is the second watch group
        [{:paths ["src/main/hawk"]
-             ;; it's context (3) is totally separate from the above group
+         ;; its context (3) is totally separate from the above group
          :context (constantly 3)
          :handler (fn [_ _]
                     (println "I'm also always first!"))}])
@@ -98,10 +102,10 @@ To stop a watch, use `hawk/stop!`:
 
 Happy watching!
 
+***
 
 ## License
 
-Copyright © 2015 Will Farrell
+Copyright (c) 2015 [Will Farrell](http://willfarrell.is)
 
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+Distributed under the Eclipse Public License either version 1.0 or (at your option) any later version.
