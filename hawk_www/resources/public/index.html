@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html href="https://github.com/wkf/hawk"><head><link type="text/css" rel="stylesheet" href="css/out/screen.css" /><link type="text/css" rel="stylesheet" href="//fonts.googleapis.com/css?family=Raleway:500" /><link type="text/css" rel="stylesheet" href="//fonts.googleapis.com/css?family=Crimson+Text" /><link type="text/css" rel="stylesheet" href="//fonts.googleapis.com/css?family=Inconsolata" /><title>Hawk</title><link rel="icon" sizes="32x32" type="image/png" href="/favicon-32x32.png" /><link rel="icon" sizes="96x96" type="image/png" href="/favicon-96x96.png" /><link rel="icon" sizes="16x16" type="image/png" href="/favicon-16x16.png" /></head><body href="https://github.com/wkf/hawk"><a href="https://github.com/wkf/hawk"><img class="ribbon" alt="Fork me on GitHub" src="img/github-banner.png" /></a><nav><a class="scroll"><img class="logo" src="img/hawk-no-circle-white.svg" /></a></nav><header><img class="logo" src="img/hawk-no-circle-white.svg" /><h1>Hawk</h1></header><main>
+<p>A Clojure library designed to watch files and directories.</p><p>Like most clojure file watchers, hawk wraps the JDK 7 java.nio.file.WatchService API. This works great when Java has a native implementation for your platform of choice. However, this is not the case on OS X, so hawk also wraps the <a href="https://code.google.com/p/barbarywatchservice/">Barbary WatchService</a> to provide performant monitoring even if you're using a mac. An appropriate implementation is chosen automatically, so all you have to do is install hawk and relax.</p><p>Hawk also features:</p><ul><li>A facility to handle "stateful" watches</li><li>The ability to filter watches, and some handy built-in filters</li><li>A name that is also a kind of bird</li></ul><hr /><h2>Installation</h2><p>To install, add the following dependency to your project.clj file:</p><pre><code class="hl"><span class="p">[</span><span class="nv">hawk</span> <span class="s">"0.1.1"</span><span class="p">]</span>
+</code></pre><hr /><h2>Usage</h2><p>To get started with using hawk, require <code class="hl"><span class="nv">hawk.core</span>
+</code> in your project:</p><pre><code class="hl"><span class="p">(</span><span class="kd">ns </span><span class="nv">hawk.sample</span>
+    <span class="p">(</span><span class="ss">:require</span> <span class="nv">hawk.core</span> <span class="ss">:as</span> <span class="nv">hawk</span><span class="p">))</span>
+</code></pre><h3>Simple Watches</h3><p>To start a simple watch:</p><pre><code class="hl"><span class="p">(</span><span class="nf">hawk/watch!</span> <span class="p">[{</span><span class="ss">:paths</span> <span class="p">[</span><span class="s">"src/main/hawk"</span><span class="p">]</span>
+               <span class="ss">:handler</span> <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">ctx</span> <span class="nv">e</span><span class="p">]</span>
+                          <span class="p">(</span><span class="nb">println </span><span class="s">"event: "</span> <span class="nv">e</span><span class="p">)</span>
+                          <span class="p">(</span><span class="nb">println </span><span class="s">"context: "</span> <span class="nv">ctx</span><span class="p">)</span>
+                          <span class="nv">ctx</span><span class="p">)}])</span>
+</code></pre><p>The <code class="hl"><span class="ss">:handler</span>
+</code> function is passed both the group's context value and the event being handled, and is expected to return the new context value. The event hash has the following structure:</p><pre><code class="hl"><span class="p">{</span><span class="ss">:kind</span> <span class="ss">:create</span>           <span class="c1">;; the event kind, one of: #{:create :modify :delete}</span>
+ <span class="ss">:file</span> <span class="o">#</span><span class="nv">java.io.File</span><span class="p">{}</span> <span class="p">}</span> <span class="c1">;; the (canonicalized) affected file</span>
+</code></pre><h3>Filtered Watches</h3><p>To start a simple filtered watch, use <code class="hl"><span class="ss">:filter</span>
+</code>:</p><pre><code class="hl"><span class="p">(</span><span class="nf">hawk/watch!</span> <span class="p">[{</span><span class="ss">:paths</span> <span class="p">[</span><span class="s">"src/main/hawk"</span><span class="p">]</span>
+               <span class="ss">:filter</span> <span class="nv">hawk/file?</span>
+               <span class="ss">:handler</span> <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">_</span> <span class="nv">_</span><span class="p">]</span>
+                          <span class="p">(</span><span class="nb">println </span><span class="s">"look ma, just files!"</span><span class="p">))}])</span>
+</code></pre><p>The <code class="hl"><span class="ss">:filter</span>
+</code> function is also passed both the group's context and event being filtered. Hawk has some built-in filters, like <code class="hl"><span class="nv">hawk/file?</span>
+</code>, but any predicate function will work.</p><h3>Stateful Watches</h3><p>To start a stateful watch, use <code class="hl"><span class="ss">:context</span>
+</code> to initialize the state, and then just return the updated state from the <code class="hl"><span class="ss">:handler</span>
+</code>. In this example, the context is initialized to <code class="hl"><span class="mi">1</span>
+</code> when the watch is started, and then incremented whenever an event is handled:</p><pre><code class="hl"><span class="p">(</span><span class="nf">hawk/watch!</span> <span class="p">[{</span><span class="ss">:paths</span> <span class="p">[</span><span class="s">"src/main/hawk"</span><span class="p">]</span>
+               <span class="ss">:context</span> <span class="p">(</span><span class="nb">constantly </span><span class="mi">1</span><span class="p">)</span>
+               <span class="ss">:handler</span> <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">ctx</span> <span class="nv">_</span><span class="p">]</span> <span class="p">(</span><span class="nb">inc </span><span class="nv">ctx</span><span class="p">))}])</span>
+</code></pre><p>The <code class="hl"><span class="ss">:context</span>
+</code> function is passed only the group's current context, and is expected to return the new context value.</p><p>Hawk supports multiple watches with a single call to <code class="hl"><span class="nv">watch!</span>
+</code>. <code class="hl"><span class="nv">watch!</span>
+</code> accepts an arbitrary number of arrays, which can hold an arbitrary number of watch specs. Every spec in an an array will share the same state, and events are processed sequentially. Every array gets its own state, and events are processed (potentially) in parallel:</p><pre><code class="hl"><span class="p">(</span><span class="nf">hawk/watch!</span>
+    <span class="c1">;; here we pass 2 groups to watch!</span>
+    <span class="p">[{</span><span class="ss">:paths</span> <span class="p">[</span><span class="s">"src/main/hawk"</span><span class="p">]</span>
+      <span class="c1">;; for the first group, context is set to 1...</span>
+      <span class="ss">:context</span> <span class="p">(</span><span class="nb">constantly </span><span class="mi">1</span><span class="p">)</span>
+      <span class="ss">:handler</span> <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">ctx</span> <span class="nv">_</span><span class="p">]</span>
+                <span class="p">(</span><span class="nb">println </span><span class="s">"I'm always first!"</span><span class="p">)</span>
+                <span class="p">(</span><span class="nb">inc </span><span class="nv">ctx</span><span class="p">))}</span>
+    <span class="p">{</span><span class="ss">:paths</span> <span class="p">[</span><span class="s">"src/test/hawk"</span><span class="p">]</span>
+     <span class="c1">;; ...and then incremented to 2 by the second watch in the group</span>
+     <span class="ss">:context</span> <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">ctx</span><span class="p">]</span> <span class="p">(</span><span class="nb">inc </span><span class="nv">ctx</span><span class="p">))</span>
+     <span class="ss">:handler</span> <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">_</span> <span class="nv">_</span><span class="p">]</span>
+                <span class="p">(</span><span class="nb">println </span><span class="s">"I'm always second place."</span><span class="p">))}]</span>
+   <span class="c1">;; here is the second watch group</span>
+   <span class="p">[{</span><span class="ss">:paths</span> <span class="p">[</span><span class="s">"src/main/hawk"</span><span class="p">]</span>
+     <span class="c1">;; its context (3) is totally separate from the above group</span>
+     <span class="ss">:context</span> <span class="p">(</span><span class="nb">constantly </span><span class="mi">3</span><span class="p">)</span>
+     <span class="ss">:handler</span> <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">_</span> <span class="nv">_</span><span class="p">]</span>
+                <span class="p">(</span><span class="nb">println </span><span class="s">"I'm also always first!"</span><span class="p">))}])</span>
+</code></pre><h3>Stopping Watches</h3><p>To stop a watch, use <code class="hl"><span class="nv">hawk/stop!</span>
+</code>:</p><pre><code class="hl"><span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">watcher</span> <span class="p">(</span><span class="nf">hawk/watch!</span> <span class="p">[</span><span class="nv">...</span><span class="p">])]</span>
+  <span class="p">(</span><span class="nf">hawk/stop!</span> <span class="nv">watcher</span><span class="p">))</span>
+</code></pre><p>Happy watching!</p><hr /><h2>License</h2><p>Copyright (c) 2015 <a href="http://willfarrell.is">Will Farrell</a></p><p>Distributed under the Eclipse Public License either version 1.0 or (at your option) any later version.</p></main><script type="text/javascript" src="js/out/main.js"></script></body></html>
