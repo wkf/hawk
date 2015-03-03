@@ -23,7 +23,7 @@
             ["do"
              ["shell" "git" "branch" "-D" "gh-pages"]
              ["shell" "git" "subtree" "split" "--prefix" "hawk_www/resources/public" "--branch" "gh-pages"]
-             ["vcs" "push" "origin" "gh-pages" "--force"]]}
+             ["shell" "git" "push" "origin" "gh-pages" "--force"]]}
   :release-tasks [["vcs" "assert-committed"]
                   ["test"]
                   ["modules" "change" "version" "leiningen.release/bump-version" "release"]
