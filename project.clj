@@ -4,14 +4,12 @@
   :source-paths ["src/main"]
   :java-source-paths ["vendor/barbarywatchservice/src"]
   :aot [hawk.watcher]
-  :dependencies [[org.clojure/clojure _]
+  :dependencies [[org.clojure/clojure "1.6.0"]
                  [net.java.dev.jna/jna "3.2.3"]]
   :plugins [[lein-modules "0.3.10"]]
-  :profiles {:dev {:dependencies [[org.clojure/core.async "0.1.346.0-17112a-alpha"]]}}
+  :profiles {:dev
+             {:dependencies [[org.clojure/core.async "0.1.346.0-17112a-alpha"]]}}
   :modules {:subprocess false
-            :versions {hawk :version
-                       org.clojure/clojure "1.6.0"
-                       org.clojure/clojurescript "0.0-2850"}
             :inherited {:url "https://github.com/wkf/hawk"
                         :scm {:name "git"
                               :url "https://github.com/wkf/hawk"}

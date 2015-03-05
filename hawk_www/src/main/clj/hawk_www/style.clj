@@ -145,4 +145,4 @@
   (concat defaults main fonts highlight))
 
 (defn manifest [config]
-  {"css/out/screen.css" #(css screen)})
+  {"css/out/screen.css" #(css config screen)})

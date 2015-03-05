@@ -4,6 +4,16 @@
             [endophile.core :refer [mp to-clj]]
             [net.cgrand.enlive-html :as html :refer [html]]))
 
+(def defaults
+  {:title "Hawk"
+   :url "https://github.com/wkf/hawk"
+   :path "../README.md"
+   :styles ["css/out/screen.css"
+            "//fonts.googleapis.com/css?family=Raleway:500"
+            "//fonts.googleapis.com/css?family=Crimson+Text"
+            "//fonts.googleapis.com/css?family=Inconsolata"]
+   :scripts ["js/out/main.js"]})
+
 (defn html5 [& nodes]
   (apply html {:type :dtd :data ["html"]} nodes))
 
@@ -57,4 +67,5 @@
   [:main] (html/content main))
 
 (defn manifest [config]
-  {"" #(-> config (assoc :main (main config)) page render)})
+  (let [config (merge defaults config)]
+    {"" #(-> config (assoc :main (main config)) page render)}))

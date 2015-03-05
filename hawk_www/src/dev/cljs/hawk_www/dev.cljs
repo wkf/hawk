@@ -1,4 +1,4 @@
-(ns ^:figwheel-no-load user
+(ns ^:figwheel-no-load hawk-www.dev
   (:require [hawk-www.core :as hawk]
             [weasel.repl :as w]
             [aviary.figwheel :as fw]))
