@@ -1,5 +1,5 @@
 (ns user
-  (:require [hawk-www.system :as hawk]
+  (:require [hawk-www.site :as hawk]
             [aviary.system :as system]
             [weasel.repl.websocket :as weasel]))
 

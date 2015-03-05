@@ -1,10 +1,11 @@
 (defproject hawk/hawk-www "0.2.1-SNAPSHOT"
   :description "GitHub Pages site for Hawk"
+  :main hawk-www.site
   :source-paths ["src/main/clj"
                  "src/main/cljs"]
   :dependencies [[org.clojure/clojure _]
                  [org.clojure/clojurescript _]
-                 [aviary "0.1.4"]
+                 [aviary "0.1.6"]
                  [enlive "1.1.5"]
                  [garden "1.2.5"]
                  [endophile "0.1.2"]
@@ -17,4 +18,5 @@
                    :repl-options {:init (user/start-dev)
                                   :nrepl-middleware
                                   [cemerick.piggieback/wrap-cljs-repl]}}}
-  :aliases {"export" ["run" "-m" "hawk-www.system/export"]})
+  :aliases {"ship" ["run" ":ship"]
+            "export" ["run" ":export"]})

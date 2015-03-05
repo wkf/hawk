@@ -1,7 +1,9 @@
-(ns hawk-www.system
+(ns hawk-www.site
+  (:gen-class)
   (:require [hawk-www.style :as style]
             [hawk-www.markup :as markup]
             [aviary.system :refer [defsystem defsystem* using]]
+            [aviary.ship :as s]
             [aviary.watch :refer [watch] :as w]
             [aviary.serve :refer [serve]]
             [aviary.figwheel :as fw]
@@ -108,10 +110,19 @@
 
 (defn export []
   (fs/export
-    {:base "resources/public"
+    {:path "resources/public"
      :resources ["assets"]
      :manifests {"css" prod-style-manifest
                  "html" prod-markup-manifest}})
   (-> prod-config :cljs fw/build-cljs))
 
-(defn -main [& args] (println "Yawp."))
+(defn ship []
+  (s/ship
+    {:type :git
+     :path "resources/public"}))
+
+(defn -main [command & args]
+  (condp = command
+    ":ship" (ship)
+    ":export" (export) (println "Yawp."))
+  (System/exit 0))

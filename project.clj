@@ -18,20 +18,14 @@
                               :url "https://github.com/wkf/hawk"}
                         :license {:name "Eclipse Public License"
                                   :url "http://www.eclipse.org/legal/epl-v10.html"}}}
-  :aliases {"export-gh-pages" ["modules" "export"]
-            "deploy-gh-pages"
-            ["do"
-             ["shell" "git" "branch" "-D" "gh-pages"]
-             ["shell" "git" "subtree" "split" "--prefix" "hawk_www/resources/public" "--branch" "gh-pages"]
-             ["shell" "git" "push" "origin" "gh-pages" "--force"]]}
   :release-tasks [["vcs" "assert-committed"]
                   ["test"]
                   ["modules" "change" "version" "leiningen.release/bump-version" "release"]
                   ["change" "version" "leiningen.release/bump-version" "release"]
-                  ["export-gh-pages"]
+                  ["modules" "export"]
                   ["vcs" "commit"]
                   ["vcs" "tag"]
-                  ["deploy-gh-pages"]
+                  ["modules" "ship"]
                   ["deploy" "clojars"]
                   ["modules" "change" "version" "leiningen.release/bump-version"]
                   ["change" "version" "leiningen.release/bump-version"]
