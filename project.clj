@@ -6,8 +6,7 @@
   :aot [hawk.watcher]
   :dependencies [[org.clojure/clojure _]
                  [net.java.dev.jna/jna "3.2.3"]]
-  :plugins [[lein-shell "0.4.0"]
-            [lein-modules "0.3.10"]]
+  :plugins [[lein-modules "0.3.10"]]
   :profiles {:dev {:dependencies [[org.clojure/core.async "0.1.346.0-17112a-alpha"]]}}
   :modules {:subprocess false
             :versions {hawk :version
