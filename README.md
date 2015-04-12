@@ -33,7 +33,7 @@ To install, add the following dependency to your project.clj file:
 To get started with using hawk, require `hawk.core` in your project:
 
     (ns hawk.sample
-        (:require hawk.core :as hawk))
+        (:require [hawk.core :as hawk]))
 
 ### Simple Watches
 
