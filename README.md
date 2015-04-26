@@ -24,7 +24,7 @@ Hawk also features:
 
 To install, add the following dependency to your project.clj file:
 
-    [![Clojars Project](http://clojars.org/hawk/latest-version.svg)](http://clojars.org/hawk)
+[![Clojars Project](http://clojars.org/hawk/latest-version.svg)](http://clojars.org/hawk)
 
 ***
 
