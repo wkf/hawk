@@ -1,4 +1,4 @@
-(defproject hawk/hawk-www "0.2.2"
+(defproject hawk/hawk-www "0.2.3-SNAPSHOT"
   :description "GitHub Pages site for Hawk"
   :main hawk-www.site
   :source-paths ["src/main/clj"
