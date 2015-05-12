@@ -36,7 +36,7 @@
       (.register path this events))
     (doseq [dir (-> path .toFile .listFiles)]
       (when (.isDirectory dir)
-        (register! this dir events))))
+        (register! this (.toPath dir) events))))
   (take! [this]
     (try (take-events this standard-watch-event-kinds)
          (catch java.nio.file.ClosedWatchServiceException _ _ nil)))
