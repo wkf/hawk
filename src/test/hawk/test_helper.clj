@@ -3,7 +3,7 @@
             [clojure.core.async :as async]
             [hawk.core :as hawk]))
 
-(def timeout 2000)
+(def timeout 30000)
 
 (defn new-temp-path []
   (str (System/getProperty "java.io.tmpdir") (gensym "hawk") "/"))
@@ -42,13 +42,14 @@
      path    ;; a string containing the temp path being watched
     ]
   "
-  [& {:as spec}]
+  [impl & {:as spec}]
   (fn
     ([]
      (let [chan (async/chan)
            path (new-temp-path)]
        (-> path io/file create-directory)
        [(hawk/watch!
+          {:watcher impl}
           [(update-in
              (merge
                {:paths [path]
