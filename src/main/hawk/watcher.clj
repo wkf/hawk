@@ -19,13 +19,14 @@
   (take! [this])
   (stop! [this]))
 
-(defn- take-events [watcher event-kinds]
+(defn- take-events [watcher normalize]
   (when-let [watch-key (try
                          (.take watcher)
                          (catch InterruptedException _ _ nil))]
-    (let [events (for [event (.pollEvents watch-key)]
-                   {:file (-> event .context str io/file .getCanonicalFile)
-                    :kind (->> event .kind (get (map-invert event-kinds)))})]
+    (let [events (for [event (.pollEvents watch-key)
+                       :let [kind (.kind event)
+                             context (.context event)]]
+                   (normalize watch-key kind context))]
       (.reset watch-key)
       events)))
 
@@ -33,12 +34,17 @@
   java.nio.file.WatchService
   (register! [this path events]
     (let [events (into-array (map standard-watch-event-kinds events))]
-      (.register path this events))
+      (.reset (.register path this events)))
     (doseq [dir (-> path .toFile .listFiles)]
       (when (.isDirectory dir)
         (register! this (.toPath dir) events))))
   (take! [this]
-    (try (take-events this standard-watch-event-kinds)
+    (try (take-events
+           this
+           (fn [watch-key kind context]
+             {:file (-> (.watchable watch-key)
+                        (.resolve context) .toFile .getCanonicalFile)
+              :kind ((map-invert standard-watch-event-kinds) kind)}))
          (catch java.nio.file.ClosedWatchServiceException _ _ nil)))
   (stop! [this]
     (doto this .close))
@@ -49,7 +55,11 @@
           events (into-array (map barbary-watch-event-kinds events))]
       (.register file this events)))
   (take! [this]
-    (try (take-events this barbary-watch-event-kinds)
+    (try (take-events
+           this
+           (fn [_ kind context]
+             {:file (-> context str io/file .getCanonicalFile)
+              :kind ((map-invert barbary-watch-event-kinds) kind)}))
          (catch com.barbarysoftware.watchservice.ClosedWatchServiceException _ _ nil)))
   (stop! [this]
     (doto this .close)))
