@@ -12,16 +12,16 @@ cljs.core.async.impl.dispatch.running_QMARK_ = true;
 
 cljs.core.async.impl.dispatch.queued_QMARK_ = false;
 
-var count_43742 = (0);
+var count_52001 = (0);
 while(true){
-var m_43743 = cljs.core.async.impl.dispatch.tasks.pop();
-if((m_43743 == null)){
+var m_52002 = cljs.core.async.impl.dispatch.tasks.pop();
+if((m_52002 == null)){
 } else {
-(m_43743.cljs$core$IFn$_invoke$arity$0 ? m_43743.cljs$core$IFn$_invoke$arity$0() : m_43743.call(null));
+(m_52002.cljs$core$IFn$_invoke$arity$0 ? m_52002.cljs$core$IFn$_invoke$arity$0() : m_52002.call(null));
 
-if((count_43742 < cljs.core.async.impl.dispatch.TASK_BATCH_SIZE)){
-var G__43744 = (count_43742 + (1));
-count_43742 = G__43744;
+if((count_52001 < cljs.core.async.impl.dispatch.TASK_BATCH_SIZE)){
+var G__52003 = (count_52001 + (1));
+count_52001 = G__52003;
 continue;
 } else {
 }
@@ -38,19 +38,19 @@ return null;
 }
 });
 cljs.core.async.impl.dispatch.queue_dispatcher = (function queue_dispatcher(){
-if(cljs.core.truth_((function (){var and__23666__auto__ = cljs.core.async.impl.dispatch.queued_QMARK_;
-if(cljs.core.truth_(and__23666__auto__)){
+if(cljs.core.truth_((function (){var and__31925__auto__ = cljs.core.async.impl.dispatch.queued_QMARK_;
+if(cljs.core.truth_(and__31925__auto__)){
 return cljs.core.async.impl.dispatch.running_QMARK_;
 } else {
-return and__23666__auto__;
+return and__31925__auto__;
 }
 })())){
 return null;
 } else {
 cljs.core.async.impl.dispatch.queued_QMARK_ = true;
 
-var G__43746 = cljs.core.async.impl.dispatch.process_messages;
-return goog.async.nextTick(G__43746);
+var G__52005 = cljs.core.async.impl.dispatch.process_messages;
+return goog.async.nextTick(G__52005);
 }
 });
 cljs.core.async.impl.dispatch.run = (function run(f){
@@ -59,7 +59,7 @@ cljs.core.async.impl.dispatch.tasks.unbounded_unshift(f);
 return cljs.core.async.impl.dispatch.queue_dispatcher();
 });
 cljs.core.async.impl.dispatch.queue_delay = (function queue_delay(f,delay){
-var G__43749 = f;
-var G__43750 = delay;
-return setTimeout(G__43749,G__43750);
+var G__52008 = f;
+var G__52009 = delay;
+return setTimeout(G__52008,G__52009);
 });
