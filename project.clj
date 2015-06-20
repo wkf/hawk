@@ -5,8 +5,7 @@
   :aot [hawk.watcher]
   :javac-options ["-target" "1.7" "-source" "1.7"]
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [net.incongru.watchservice/barbary-watchservice "1.0"]
-                 [net.java.dev.jna/jna "3.2.3"]]
+                 [net.incongru.watchservice/barbary-watchservice "1.0"]]
   :plugins [[lein-modules "0.3.10"]]
   :profiles {:dev
              {:dependencies [[org.clojure/core.async "0.1.346.0-17112a-alpha"]]}}
