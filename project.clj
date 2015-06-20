@@ -2,10 +2,10 @@
   :description "Watch files with clojure (in the manner of a hawk)"
   :test-paths ["src/test"]
   :source-paths ["src/main"]
-  :java-source-paths ["vendor/barbarywatchservice/src"]
   :aot [hawk.watcher]
   :javac-options ["-target" "1.7" "-source" "1.7"]
   :dependencies [[org.clojure/clojure "1.6.0"]
+                 [net.incongru.watchservice/barbary-watchservice "1.0"]
                  [net.java.dev.jna/jna "3.2.3"]]
   :plugins [[lein-modules "0.3.10"]]
   :profiles {:dev
