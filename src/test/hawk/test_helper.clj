@@ -6,7 +6,10 @@
 (def timeout 30000)
 
 (defn new-temp-path []
-  (str (System/getProperty "java.io.tmpdir") (gensym "hawk") "/"))
+  (.getPath
+   (io/file
+    (System/getProperty "java.io.tmpdir")
+    (str (gensym "hawk")))))
 
 (defn create-file [file]
   (doto file .createNewFile))
