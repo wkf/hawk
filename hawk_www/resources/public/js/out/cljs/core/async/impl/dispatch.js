@@ -12,16 +12,16 @@ cljs.core.async.impl.dispatch.running_QMARK_ = true;
 
 cljs.core.async.impl.dispatch.queued_QMARK_ = false;
 
-var count_52001 = (0);
+var count_36529 = (0);
 while(true){
-var m_52002 = cljs.core.async.impl.dispatch.tasks.pop();
-if((m_52002 == null)){
+var m_36530 = cljs.core.async.impl.dispatch.tasks.pop();
+if((m_36530 == null)){
 } else {
-(m_52002.cljs$core$IFn$_invoke$arity$0 ? m_52002.cljs$core$IFn$_invoke$arity$0() : m_52002.call(null));
+(m_36530.cljs$core$IFn$_invoke$arity$0 ? m_36530.cljs$core$IFn$_invoke$arity$0() : m_36530.call(null));
 
-if((count_52001 < cljs.core.async.impl.dispatch.TASK_BATCH_SIZE)){
-var G__52003 = (count_52001 + (1));
-count_52001 = G__52003;
+if((count_36529 < cljs.core.async.impl.dispatch.TASK_BATCH_SIZE)){
+var G__36531 = (count_36529 + (1));
+count_36529 = G__36531;
 continue;
 } else {
 }
@@ -38,19 +38,19 @@ return null;
 }
 });
 cljs.core.async.impl.dispatch.queue_dispatcher = (function queue_dispatcher(){
-if(cljs.core.truth_((function (){var and__31925__auto__ = cljs.core.async.impl.dispatch.queued_QMARK_;
-if(cljs.core.truth_(and__31925__auto__)){
+if(cljs.core.truth_((function (){var and__16453__auto__ = cljs.core.async.impl.dispatch.queued_QMARK_;
+if(cljs.core.truth_(and__16453__auto__)){
 return cljs.core.async.impl.dispatch.running_QMARK_;
 } else {
-return and__31925__auto__;
+return and__16453__auto__;
 }
 })())){
 return null;
 } else {
 cljs.core.async.impl.dispatch.queued_QMARK_ = true;
 
-var G__52005 = cljs.core.async.impl.dispatch.process_messages;
-return goog.async.nextTick(G__52005);
+var G__36533 = cljs.core.async.impl.dispatch.process_messages;
+return goog.async.nextTick(G__36533);
 }
 });
 cljs.core.async.impl.dispatch.run = (function run(f){
@@ -59,7 +59,7 @@ cljs.core.async.impl.dispatch.tasks.unbounded_unshift(f);
 return cljs.core.async.impl.dispatch.queue_dispatcher();
 });
 cljs.core.async.impl.dispatch.queue_delay = (function queue_delay(f,delay){
-var G__52008 = f;
-var G__52009 = delay;
-return setTimeout(G__52008,G__52009);
+var G__36536 = f;
+var G__36537 = delay;
+return setTimeout(G__36536,G__36537);
 });
