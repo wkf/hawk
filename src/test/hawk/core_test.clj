@@ -7,8 +7,8 @@
 (def supported-watcher-implementations
   (if (= "Mac OS X"
          (System/getProperty "os.name"))
-    [:barbary :java]
-    [:java]))
+    [:barbary :java :polling]
+    [:java :polling]))
 
 (deftest test-simple-watcher
   (doseq [impl supported-watcher-implementations]
