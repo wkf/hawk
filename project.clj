@@ -1,7 +1,8 @@
 (defproject hawk "0.2.7-SNAPSHOT"
   :description "Watch files with clojure (in the manner of a hawk)"
-  :test-paths ["src/test"]
-  :source-paths ["src/main"]
+  :test-paths ["src/test/clojure"]
+  :source-paths ["src/main/clojure"]
+  :java-source-paths ["src/main/java"]
   :aot [hawk.watcher]
   :javac-options ["-target" "1.7" "-source" "1.7"]
   :dependencies [[org.clojure/clojure "1.6.0"]

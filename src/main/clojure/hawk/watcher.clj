@@ -1,8 +1,7 @@
 (ns hawk.watcher
   (:require [clojure.java.io :as io]
             [clojure.set :refer [map-invert]])
-  (:import (sun.nio.fs.PollingWatchService)
-           (java.nio.file FileSystems Path Paths StandardWatchEventKinds)
+  (:import (java.nio.file FileSystems Path Paths StandardWatchEventKinds WatchEvent$Modifier)
            (com.barbarysoftware.watchservice StandardWatchEventKind WatchableFile)))
 
 (def barbary-watch-event-kinds
@@ -31,13 +30,17 @@
       (.reset watch-key)
       events)))
 
+(defn- recursive-register! [this path events f]
+  (let [events (into-array (map standard-watch-event-kinds events))]
+    (.reset (f events)))
+  (doseq [dir (-> path .toFile .listFiles)]
+    (when (.isDirectory dir)
+      (register! this (.toPath dir) events))))
+
 (def java-watcher-impl
   {:register! (fn [this path events]
-               (let [events (into-array (map standard-watch-event-kinds events))]
-                 (.reset (.register path this events)))
-               (doseq [dir (-> path .toFile .listFiles)]
-                 (when (.isDirectory dir)
-                   (register! this (.toPath dir) events))))
+                (recursive-register! this path events
+                  #(.register path this %)))
    :take! (fn [this]
             (try (take-events
                    this
@@ -49,11 +52,17 @@
    :stop! (fn [this]
             (doto this .close))})
 
+(def polling-watcher-impl
+  (assoc java-watcher-impl
+    :register! (fn [this path events]
+                 (recursive-register! this path events
+                   #(.register this path % (into-array WatchEvent$Modifier []))))))
+
 (def barbary-watcher-impl
   {:register! (fn [this path events]
-               (let [file (-> path .toFile WatchableFile.)
-                     events (into-array (map barbary-watch-event-kinds events))]
-                 (.register file this events)))
+                (let [file (-> path .toFile WatchableFile.)
+                      events (into-array (map barbary-watch-event-kinds events))]
+                  (.register file this events)))
    :take! (fn [this]
             (try (take-events
                    this
@@ -65,7 +74,7 @@
             (doto this .close))})
 
 (extend java.nio.file.WatchService Watcher java-watcher-impl)
-(extend sun.nio.fs.PollingWatchService Watcher java-watcher-impl)
+(extend hawk.PollingWatchService Watcher polling-watcher-impl)
 (extend com.barbarysoftware.watchservice.WatchService Watcher barbary-watcher-impl)
 
 (defmulti new-watcher identity)
@@ -77,10 +86,7 @@
   (.newWatchService (FileSystems/getDefault)))
 
 (defmethod new-watcher :polling [_]
-  ;;  Yuck.
-  (let [ctor (-> sun.nio.fs.PollingWatchService .getDeclaredConstructors (nth 0))]
-    (.setAccessible ctor true)
-    (.newInstance ctor (into-array Object []))))
+  (hawk.PollingWatchService.))
 
 (defmethod new-watcher :default [_]
   (new-watcher
