@@ -52,7 +52,10 @@ public class PollingWatchService
     // used to execute the periodic tasks that poll for changes
     private final ScheduledExecutorService scheduledExecutor;
 
-    public PollingWatchService() {
+    private SensitivityWatchEventModifier sensitivity;
+
+    public PollingWatchService(SensitivityWatchEventModifier sensitivity) {
+        this.sensitivity = sensitivity;
         // TBD: Make the number of threads configurable
         scheduledExecutor = Executors
             .newSingleThreadScheduledExecutor(new ThreadFactory() {
@@ -102,7 +105,7 @@ public class PollingWatchService
         }
 
         // A modifier may be used to specify the sensitivity level
-        SensitivityWatchEventModifier sensivity = SensitivityWatchEventModifier.MEDIUM;
+        SensitivityWatchEventModifier sensivity = this.sensitivity;
         if (modifiers.length > 0) {
             for (WatchEvent.Modifier modifier: modifiers) {
                 if (modifier == null)
@@ -289,7 +292,7 @@ public class PollingWatchService
                 // create the periodic task
                 Runnable thunk = new Runnable() { public void run() { poll(); }};
                 this.poller = scheduledExecutor
-                    .scheduleAtFixedRate(thunk, period, period, TimeUnit.SECONDS);
+                    .scheduleAtFixedRate(thunk, period, period, TimeUnit.MILLISECONDS);
             }
         }
 

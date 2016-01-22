@@ -59,7 +59,7 @@
 (defn watch! [opts & groups]
   (let [[opts
          groups] (if (map? opts) [opts groups] [{} (cons opts groups)])
-        watcher (-> opts :watcher new-watcher)
+        watcher (-> opts new-watcher)
         specs (mapcat
                 (fn [specs]
                   (let [a (agent {})]

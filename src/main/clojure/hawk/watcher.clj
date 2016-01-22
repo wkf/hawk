@@ -1,7 +1,8 @@
 (ns hawk.watcher
   (:require [clojure.java.io :as io]
             [clojure.set :refer [map-invert]])
-  (:import (java.nio.file FileSystems Path Paths StandardWatchEventKinds WatchEvent$Modifier)
+  (:import (hawk SensitivityWatchEventModifier)
+           (java.nio.file FileSystems Path Paths StandardWatchEventKinds WatchEvent$Modifier)
            (com.barbarysoftware.watchservice StandardWatchEventKind WatchableFile)))
 
 (def barbary-watch-event-kinds
@@ -13,6 +14,11 @@
   {:create StandardWatchEventKinds/ENTRY_CREATE
    :modify StandardWatchEventKinds/ENTRY_MODIFY
    :delete StandardWatchEventKinds/ENTRY_DELETE})
+
+(def sensitivity-watch-event-modifiers
+  {:high SensitivityWatchEventModifier/HIGH
+   :medium SensitivityWatchEventModifier/MEDIUM
+   :low SensitivityWatchEventModifier/LOW})
 
 (defprotocol Watcher
   (register! [this path events])
@@ -77,7 +83,7 @@
 (extend hawk.PollingWatchService Watcher polling-watcher-impl)
 (extend com.barbarysoftware.watchservice.WatchService Watcher barbary-watcher-impl)
 
-(defmulti new-watcher identity)
+(defmulti new-watcher :watcher)
 
 (defmethod new-watcher :barbary [_]
   (com.barbarysoftware.watchservice.WatchService/newWatchService))
@@ -85,8 +91,8 @@
 (defmethod new-watcher :java [_]
   (.newWatchService (FileSystems/getDefault)))
 
-(defmethod new-watcher :polling [_]
-  (hawk.PollingWatchService.))
+(defmethod new-watcher :polling [{:keys [sensitivity]}]
+  (hawk.PollingWatchService. (get sensitivity-watch-event-modifiers (or sensitivity :high))))
 
 (defmethod new-watcher :default [_]
   (new-watcher

@@ -38,15 +38,15 @@ public enum SensitivityWatchEventModifier implements Modifier {
     /**
      * High sensitivity.
      */
-    HIGH(2),
+    HIGH(500),
     /**
      * Medium sensitivity.
      */
-    MEDIUM(10),
+    MEDIUM(5000),
     /**
      * Low sensitivity.
      */
-    LOW(30);
+    LOW(30000);
 
     /**
      * Returns the sensitivity in seconds.
