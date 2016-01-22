@@ -93,6 +93,19 @@ Hawk supports multiple watches with a single call to `watch!`. `watch!` accepts 
          :handler (fn [_ _]
                     (println "I'm also always first!"))}])
 
+### Polling Watches
+
+There are cases (such as within virtual environments) where the operating system will not receive events when a file has changed. Hawk provides a polling watcher as a fallback mechanism for handling these cases:
+
+    (hawk/watch! {:watcher :polling}
+                 [{:paths ["src/main/hawk"]
+                   :handler (fn [ctx e]
+                              (println "event: " e)
+                              (println "context: " ctx)
+                              ctx)}])
+
+You may also provide a `:sensitivity` argument of `:high` (the default), `:medium`, or `:low` depending on how often you want polling to occur.
+
 ### Stopping Watches
 
 To stop a watch, use `hawk/stop!`:
