@@ -96,4 +96,5 @@
 
 (defmethod new-watcher :default [_]
   (new-watcher
-    (if (= "Mac OS X" (System/getProperty "os.name")) :barbary :java)))
+    {:watcher
+     (if (= "Mac OS X" (System/getProperty "os.name")) :barbary :java)}))
