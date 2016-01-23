@@ -46,7 +46,17 @@
      <span class="ss">:context</span> <span class="p">(</span><span class="nb">constantly </span><span class="mi">3</span><span class="p">)</span>
      <span class="ss">:handler</span> <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">_</span> <span class="nv">_</span><span class="p">]</span>
                 <span class="p">(</span><span class="nb">println </span><span class="s">"I'm also always first!"</span><span class="p">))}])</span>
-</code></pre><h3>Stopping Watches</h3><p>To stop a watch, use <code class="hl"><span class="nv">hawk/stop!</span>
+</code></pre><h3>Polling Watches</h3><p>There are cases (such as within virtual environments) where the operating system will not receive events when a file has changed. Hawk provides a polling watcher as a fallback mechanism for handling these cases:</p><pre><code class="hl"><span class="p">(</span><span class="nf">hawk/watch!</span> <span class="p">{</span><span class="ss">:watcher</span> <span class="ss">:polling</span><span class="p">}</span>
+             <span class="p">[{</span><span class="ss">:paths</span> <span class="p">[</span><span class="s">"src/main/hawk"</span><span class="p">]</span>
+               <span class="ss">:handler</span> <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">ctx</span> <span class="nv">e</span><span class="p">]</span>
+                          <span class="p">(</span><span class="nb">println </span><span class="s">"event: "</span> <span class="nv">e</span><span class="p">)</span>
+                          <span class="p">(</span><span class="nb">println </span><span class="s">"context: "</span> <span class="nv">ctx</span><span class="p">)</span>
+                          <span class="nv">ctx</span><span class="p">)}])</span>
+</code></pre><p>You may also provide a <code class="hl"><span class="ss">:sensitivity</span>
+</code> argument of <code class="hl"><span class="ss">:high</span>
+</code> (the default), <code class="hl"><span class="ss">:medium</span>
+</code>, or <code class="hl"><span class="ss">:low</span>
+</code> depending on how often you want polling to occur.</p><h3>Stopping Watches</h3><p>To stop a watch, use <code class="hl"><span class="nv">hawk/stop!</span>
 </code>:</p><pre><code class="hl"><span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">watcher</span> <span class="p">(</span><span class="nf">hawk/watch!</span> <span class="p">[</span><span class="nv">...</span><span class="p">])]</span>
   <span class="p">(</span><span class="nf">hawk/stop!</span> <span class="nv">watcher</span><span class="p">))</span>
 </code></pre><p>Happy watching!</p><hr /><h2>License</h2><p>Copyright (c) 2015 <a href="http://willfarrell.is">Will Farrell</a></p><p>Distributed under the Eclipse Public License either version 1.0 or (at your option) any later version.</p></main><script type="text/javascript" src="js/out/main.js"></script></body></html>
