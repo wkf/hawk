@@ -1,8 +1,8 @@
 (ns hawk.watcher
   (:require [clojure.java.io :as io]
             [clojure.set :refer [map-invert]])
-  (:import (hawk SensitivityWatchEventModifier)
-           java.io.File
+  (:import (java.io File)
+           (hawk SensitivityWatchEventModifier)
            (java.nio.file FileSystems Path Paths StandardWatchEventKinds WatchEvent WatchEvent$Modifier WatchKey WatchService)
            (com.barbarysoftware.watchservice StandardWatchEventKind WatchableFile)))
 
@@ -26,37 +26,42 @@
   (take! [this])
   (stop! [this]))
 
-(defn- take-events [^WatchService watcher normalize]
-  (when-let [^WatchKey watch-key (try
-                                   (.take watcher)
-                                   (catch InterruptedException _ _ nil))]
-    (let [events (for [^WatchEvent event (.pollEvents watch-key)
-                       :let [kind (.kind event)
-                             context (.context event)]]
-                   (normalize watch-key kind context))]
-      (.reset watch-key)
+(defn- take-events [watcher take-fn poll-fn parse-fn reset-fn]
+  (when-let [watch-key (try
+                         (take-fn watcher)
+                         (catch InterruptedException _ _ nil))]
+    (let [events (for [event (poll-fn watch-key)]
+                   (parse-fn watch-key event))]
+      (reset-fn watch-key)
       events)))
 
-(defn- recursive-register! [this ^Path path events f]
+(defn- recursive-register! [this ^Path path events register-fn reset-fn]
   (let [events (into-array (map standard-watch-event-kinds events))]
-    (.reset ^WatchKey (f events)))
-  (doseq [^File dir (-> path .toFile .listFiles)]
+    (reset-fn (register-fn events)))
+  (doseq [^java.io.File dir (-> path .toFile .listFiles)]
     (when (.isDirectory dir)
       (register! this (.toPath dir) events))))
 
 (def java-watcher-impl
   {:register! (fn [this ^Path path events]
                 (recursive-register! this path events
-                  #(.register path this %)))
+                  #(.register path this %)
+                  #(.reset ^WatchKey %)))
    :take! (fn [this]
             (try (take-events
                    this
-                   (fn [^WatchKey watch-key kind ^Path context]
-                     {:file (.. ^Path (.watchable watch-key)                                
+                   #(.take ^WatchService %)
+                   #(.pollEvents ^WatchKey %)
+                   (fn [^WatchKey watch-key ^WatchEvent event]
+                     (let [kind (.kind event)
+                           context ^Path (.context event)
+                           path ^Path (.watchable watch-key)]
+                       {:file (.. path
                                 (resolve context)
                                 toFile
                                 getCanonicalFile)
-                      :kind ((map-invert standard-watch-event-kinds) kind)}))
+                        :kind ((map-invert standard-watch-event-kinds) kind)}))
+                   #(.reset ^WatchKey %))
                  (catch java.nio.file.ClosedWatchServiceException _ _ nil)))
    :stop! (fn [^WatchService this]
             (.close this))})
@@ -65,7 +70,8 @@
   (assoc java-watcher-impl
     :register! (fn [^hawk.PollingWatchService this path events]
                  (recursive-register! this path events
-                   #(.register this path % (into-array WatchEvent$Modifier []))))))
+                   #(.register this path % (into-array WatchEvent$Modifier []))
+                   #(.reset ^hawk.AbstractWatchKey %)))))
 
 (def barbary-watcher-impl
   {:register! (fn [this ^Path path events]
@@ -75,11 +81,16 @@
    :take! (fn [this]
             (try (take-events
                    this
-                   (fn [_ kind context]
-                     {:file (-> context str io/file .getCanonicalFile)
-                      :kind ((map-invert barbary-watch-event-kinds) kind)}))
+                   #(.take ^com.barbarysoftware.watchservice.WatchService %)
+                   #(.pollEvents ^com.barbarysoftware.watchservice.WatchKey %)
+                   (fn [_ ^com.barbarysoftware.watchservice.WatchEvent event]
+                     (let [kind (.kind event)
+                           context (.context event)]
+                       {:file (-> context str io/file .getCanonicalFile)
+                        :kind ((map-invert barbary-watch-event-kinds) kind)}))
+                   #(.reset ^com.barbarysoftware.watchservice.WatchService %))
                  (catch com.barbarysoftware.watchservice.ClosedWatchServiceException _ _ nil)))
-   :stop! (fn [^WatchService this]
+   :stop! (fn [^com.barbarysoftware.watchservice.WatchService this]
             (.close this))})
 
 (extend java.nio.file.WatchService Watcher java-watcher-impl)
