@@ -1,4 +1,4 @@
-(defproject hawk "0.2.11-SNAPSHOT"
+(defproject hawk "0.2.11"
   :description "Watch files with clojure (in the manner of a hawk)"
   :test-paths ["src/test/clojure"]
   :source-paths ["src/main/clojure"]
