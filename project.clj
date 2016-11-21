@@ -5,7 +5,7 @@
   :java-source-paths ["src/main/java"]
   :aot [hawk.watcher]
   :javac-options ["-target" "1.7" "-source" "1.7"]
-  :dependencies [[org.clojure/clojure "1.6.0"]
+  :dependencies [[org.clojure/clojure "1.8.0"]
                  [net.incongru.watchservice/barbary-watchservice "1.0"]]
   :plugins [[lein-modules "0.3.10"]]
   :profiles {:dev
