@@ -17,7 +17,7 @@
 (defn modify-file [file]
   (doto file
     (.setLastModified
-      (long (/ (System/currentTimeMillis) 1000)))))
+     (long (/ (System/currentTimeMillis) 1000)))))
 
 (defn delete-file [file]
   (doto file .delete))
@@ -52,21 +52,21 @@
            path (new-temp-path)]
        (-> path io/file create-directory)
        [(hawk/watch!
-          {:watcher impl}
-          [(update-in
-             (merge
-               {:paths [path]
-                :handler (fn [ctx e] ctx)}
-               spec)
-             [:handler]
-             #(fn [ctx e]
-                (async/put! chan
-                            (assoc e :context ctx))
-                (%1 ctx e)))])
+         {:watcher impl}
+         [(update-in
+           (merge
+            {:paths [path]
+             :handler (fn [ctx e] ctx)}
+            spec)
+           [:handler]
+           #(fn [ctx e]
+              (async/put! chan
+                          (assoc e :context ctx))
+              (%1 ctx e)))])
         (repeatedly
-          #(async/alt!!
-             chan ([v] v)
-             (async/timeout timeout) nil))
+         #(async/alt!!
+            chan ([v] v)
+            (async/timeout timeout) nil))
         path]))
     ([[watcher _ path]]
      (hawk/stop! watcher)
@@ -78,15 +78,15 @@
   (let [rs (gensym)
         gs (gensym)
         fs (keep-indexed
-             #(when (odd? %1) %2) bindings)
+            #(when (odd? %1) %2) bindings)
         bs (keep-indexed
-             #(when (even? %1) %2) bindings)]
+            #(when (even? %1) %2) bindings)]
     `(let [~gs ~(vec fs)
            ~rs (map #(%1) ~gs)]
        (try
          (let ~(vec
-                 (apply concat (map-indexed
-                                 (fn [i x] [x `(nth ~rs ~i)]) bs)))
+                (apply concat (map-indexed
+                               (fn [i x] [x `(nth ~rs ~i)]) bs)))
            ~@body)
          (finally
            (mapv #(%1 %2) ~gs ~rs))))))
