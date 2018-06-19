@@ -31,33 +31,38 @@ To install, add the following dependency to your project.clj file:
 ## Usage
 
 To get started with using hawk, require `hawk.core` in your project:
-
+```clojure
     (ns hawk.sample
         (:require [hawk.core :as hawk]))
+```
 
 ### Simple Watches
 
 To start a simple watch:
-
+```clojure
     (hawk/watch! [{:paths ["src/main/hawk"]
                    :handler (fn [ctx e]
                               (println "event: " e)
                               (println "context: " ctx)
                               ctx)}])
+```
 
 The `:handler` function is passed both the group's context value and the event being handled, and is expected to return the new context value. The event hash has the following structure:
 
+```clojure
     {:kind :create           ;; the event kind, one of: #{:create :modify :delete}
      :file #java.io.File{} } ;; the (canonicalized) affected file
+```
 
 ### Filtered Watches
 
 To start a simple filtered watch, use `:filter`:
-
+```clojure
     (hawk/watch! [{:paths ["src/main/hawk"]
                    :filter hawk/file?
                    :handler (fn [_ _]
                               (println "look ma, just files!"))}])
+```
 
 The `:filter` function is also passed both the group's context and event being filtered. Hawk has some built-in filters, like `hawk/file?`, but any predicate function will work.
 
@@ -65,14 +70,16 @@ The `:filter` function is also passed both the group's context and event being f
 
 To start a stateful watch, use `:context` to initialize the state, and then just return the updated state from the `:handler`. In this example, the context is initialized to `1` when the watch is started, and then incremented whenever an event is handled:
 
+```clojure
     (hawk/watch! [{:paths ["src/main/hawk"]
                    :context (constantly 1)
                    :handler (fn [ctx _] (inc ctx))}])
-
+```
 The `:context` function is passed only the group's current context, and is expected to return the new context value.
 
 Hawk supports multiple watches with a single call to `watch!`. `watch!` accepts an arbitrary number of arrays, which can hold an arbitrary number of watch specs. Every spec in an an array will share the same state, and events are processed sequentially. Every array gets its own state, and events are processed (potentially) in parallel:
 
+```clojure
     (hawk/watch!
         ;; here we pass 2 groups to watch!
         [{:paths ["src/main/hawk"]
@@ -92,26 +99,30 @@ Hawk supports multiple watches with a single call to `watch!`. `watch!` accepts 
          :context (constantly 3)
          :handler (fn [_ _]
                     (println "I'm also always first!"))}])
+```
 
 ### Polling Watches
 
 There are cases (such as within virtual environments) where the operating system will not receive events when a file has changed. Hawk provides a polling watcher as a fallback mechanism for handling these cases:
 
+```clojure
     (hawk/watch! {:watcher :polling}
                  [{:paths ["src/main/hawk"]
                    :handler (fn [ctx e]
                               (println "event: " e)
                               (println "context: " ctx)
                               ctx)}])
+```
 
 You may also provide a `:sensitivity` argument of `:high` (the default), `:medium`, or `:low` depending on how often you want polling to occur.
 
 ### Stopping Watches
 
 To stop a watch, use `hawk/stop!`:
-
+```clojure
     (let [watcher (hawk/watch! [...])]
       (hawk/stop! watcher))
+```
 
 Happy watching!
 
