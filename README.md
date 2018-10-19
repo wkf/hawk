@@ -71,7 +71,7 @@ To start a stateful watch, use `:context` to initialize the state, and then just
 
 The `:context` function is passed only the group's current context, and is expected to return the new context value.
 
-Hawk supports multiple watches with a single call to `watch!`. `watch!` accepts an arbitrary number of arrays, which can hold an arbitrary number of watch specs. Every spec in an an array will share the same state, and events are processed sequentially. Every array gets its own state, and events are processed (potentially) in parallel:
+Hawk supports multiple watches with a single call to `watch!`. `watch!` accepts an arbitrary number of arrays, which can hold an arbitrary number of watch specs. Every spec in an array will share the same state, and events are processed sequentially. Every array gets its own state, and events are processed (potentially) in parallel:
 
     (hawk/watch!
         ;; here we pass 2 groups to watch!
