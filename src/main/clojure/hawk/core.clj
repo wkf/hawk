@@ -1,6 +1,7 @@
 (ns hawk.core
   (:require [clojure.java.io :as io]
-            [hawk.watcher :refer [new-watcher] :as watcher]))
+            [hawk.watcher :refer [new-watcher] :as watcher])
+  (:import [java.io File]))
 
 (defn catch-errors [f]
   (fn [& args]
@@ -13,13 +14,13 @@
   (merge spec
          (->> paths
               (map #(-> % io/file .getCanonicalFile))
-              (group-by #(if (.isFile %) :files :directories)))))
+              (group-by #(if (.isFile ^File %) :files :directories)))))
 
 (defn process-paths [{:keys [files directories] :as spec}]
   (assoc spec :paths
          (concat
-           (map #(-> % .toPath) directories)
-           (map #(-> % .getParentFile .toPath) files))))
+           (map #(.toPath ^File %) directories)
+           (map #(-> (.getParentFile ^File %) .toPath) files))))
 
 (defn process-context [spec]
   (assoc spec :context
@@ -30,7 +31,7 @@
   (assoc spec :handler
          (catch-errors
            (fn [ctx {:keys [file kind] :as e}]
-             (let [path (-> file .toPath)]
+             (let [path (.toPath ^File file)]
                (if (and
                      (some #(.startsWith path %) paths)
                      (or (empty? files)
@@ -92,15 +93,16 @@
      :watcher watcher}))
 
 (defn stop! [watch]
-  (doto
-    (:thread watch) .interrupt .join)
+  (let [thread ^Thread (:thread watch)]
+    (.interrupt thread)
+    (.join thread))
   (-> watch :watcher watcher/stop!))
 
 (defn file? [_ {:keys [file]}]
-  (.isFile file))
+  (.isFile ^File file))
 
 (defn directory? [_ {:keys [file]}]
-  (.isDirectory file))
+  (.isDirectory ^File file))
 
 (defn created? [_ {:keys [kind]}]
   (= kind :create))
