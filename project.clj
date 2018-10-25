@@ -9,7 +9,8 @@
                  [net.incongru.watchservice/barbary-watchservice "1.0"]]
   :plugins [[lein-modules "0.3.10"]]
   :profiles {:dev
-             {:dependencies [[org.clojure/core.async "0.1.346.0-17112a-alpha"]]}}
+             {:dependencies [[org.clojure/core.async "0.1.346.0-17112a-alpha"]]
+              :global-vars {*warn-on-reflection* true}}}
   :modules {:subprocess false
             :inherited {:url "https://github.com/wkf/hawk"
                         :scm {:name "git"
