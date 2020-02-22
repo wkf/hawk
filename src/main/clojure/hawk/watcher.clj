@@ -6,6 +6,8 @@
            (java.nio.file FileSystems Path Paths StandardWatchEventKinds WatchEvent WatchEvent$Modifier WatchKey WatchService)
            (com.barbarysoftware.watchservice StandardWatchEventKind WatchableFile)))
 
+(set! *warn-on-reflection* true)
+
 (def barbary-watch-event-kinds
   {:create StandardWatchEventKind/ENTRY_CREATE
    :modify StandardWatchEventKind/ENTRY_MODIFY
@@ -48,10 +50,7 @@
    :context (.context e)})
 
 (defn- handle-watch-event! [this ^Path path {:keys [kind context]}]
-  (let [file (.. path
-                 (resolve context)
-                 toFile
-                 getCanonicalFile)]
+  (let [file (.getCanonicalFile (.toFile ^Path (resolve path (cast Path context))))]
     (if (and (= kind :create) (.isDirectory file))
       (do
         (register! this (.toPath file) [:create :modify :delete])
@@ -64,7 +63,7 @@
              file-seq
              (map (fn [f]
                     {:kind :create
-                     :file (.getCanonicalFile f)}))))
+                     :file (.getCanonicalFile ^File f)}))))
       [{:kind kind
         :file file}])))
 
@@ -110,7 +109,7 @@
                           context (.context event)]
                       {:file (-> context str io/file .getCanonicalFile)
                        :kind ((map-invert barbary-watch-event-kinds) kind)}))
-                  #(.reset ^com.barbarysoftware.watchservice.WatchService %))
+                  #(.reset ^com.barbarysoftware.watchservice.WatchKey %))
                  (catch com.barbarysoftware.watchservice.ClosedWatchServiceException _ _ nil)))
    :stop! (fn [^com.barbarysoftware.watchservice.WatchService this]
             (.close this))})

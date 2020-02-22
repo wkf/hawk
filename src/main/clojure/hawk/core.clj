@@ -1,6 +1,10 @@
 (ns hawk.core
   (:require [clojure.java.io :as io]
-            [hawk.watcher :refer [new-watcher] :as watcher]))
+            [hawk.watcher :refer [new-watcher] :as watcher])
+  (:import [java.nio.file Path]
+           [java.io File]))
+
+(set! *warn-on-reflection* true)
 
 (defn catch-errors [f]
   (fn [& args]
@@ -13,13 +17,13 @@
   (merge spec
          (->> paths
               (map #(-> % io/file .getCanonicalFile))
-              (group-by #(if (.isFile %) :files :directories)))))
+              (group-by #(if (.isFile ^File %) :files :directories)))))
 
 (defn process-paths [{:keys [files directories] :as spec}]
   (assoc spec :paths
          (concat
-           (map #(-> % .toPath) directories)
-           (map #(-> % .getParentFile .toPath) files))))
+           (map #(.toPath ^File %) directories)
+           (map #(-> ^File % .getParentFile .toPath) files))))
 
 (defn process-context [spec]
   (assoc spec :context
@@ -29,10 +33,10 @@
 (defn process-handler [{:keys [files paths] :as spec}]
   (assoc spec :handler
          (catch-errors
-           (fn [ctx {:keys [file kind] :as e}]
-             (let [path (-> file .toPath)]
+           (fn [ctx {:keys [^File file kind] :as e}]
+             (let [path ^Path (.toPath file)]
                (if (and
-                     (some #(.startsWith path %) paths)
+                     (some #(.startsWith path ^Path %) paths)
                      (or (empty? files)
                          (some (partial = file) files))
                      (or (not (:filter spec))
@@ -44,7 +48,7 @@
 (defn remove-duplicate-paths [paths]
   (seq
     (apply
-      sorted-set-by #(.compareTo %1 %2) paths)))
+      sorted-set-by #(.compareTo ^Path %1 ^Path %2) paths)))
 
 (defn remove-children-paths [paths]
   (loop [a []
@@ -52,7 +56,7 @@
     (cond
       (seq ps) (recur
                  (conj a p)
-                 (remove #(.startsWith % p) ps))
+                 (remove #(.startsWith ^Path % ^Path p) ps))
       p (conj a p)
       :else a)))
 
@@ -93,14 +97,14 @@
 
 (defn stop! [watch]
   (doto
-    (:thread watch) .interrupt .join)
+    ^Thread (:thread watch) .interrupt .join)
   (-> watch :watcher watcher/stop!))
 
 (defn file? [_ {:keys [file]}]
-  (.isFile file))
+  (.isFile ^File file))
 
 (defn directory? [_ {:keys [file]}]
-  (.isDirectory file))
+  (.isDirectory ^File file))
 
 (defn created? [_ {:keys [kind]}]
   (= kind :create))
