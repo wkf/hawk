@@ -88,6 +88,7 @@
                      (empty?
                        (mapv handler* (watcher/take! watcher)))
                      (recur))))
+               (.setDaemon true)
                .start)
      :watcher watcher}))
 
