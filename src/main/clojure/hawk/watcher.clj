@@ -49,8 +49,8 @@
           (.kind e))
    :context (.context e)})
 
-(defn- handle-watch-event! [this ^Path path {:keys [kind context]}]
-  (let [file (.getCanonicalFile (.toFile ^Path (resolve path (cast Path context))))]
+(defn- handle-watch-event! [this ^Path path {:keys [kind ^Path context]}]
+  (let [file (.getCanonicalFile (.toFile ^Path (.resolve path context)))]
     (if (and (= kind :create) (.isDirectory file))
       (do
         (register! this (.toPath file) [:create :modify :delete])
