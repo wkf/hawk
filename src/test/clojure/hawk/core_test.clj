@@ -26,7 +26,7 @@
            :delete)
           "deleting a file should produce a :delete event"))))
 
-(deftest test-recursize-watcher
+(deftest test-recursive-watcher
   (doseq [impl supported-watcher-implementations]
     (with-watchers [[_ events path] (simple-watcher impl)]
       (create-directory (io/file path "d"))
